@@ -114,9 +114,9 @@ h1 {
   box-shadow: 0 0 0 2px var(--accent);
 }
 .cell.faded { opacity: 0.12; }
-.cell .num { font-size: 6.5px; color: rgba(255,255,255,0.7); line-height: 1; font-family: 'Space Mono', monospace; }
-.cell .sym { font-size: 12px; font-weight: 700; color: #fff; line-height: 1.1; font-family: 'Space Mono', monospace; }
-.cell .nm  { font-size: 5px; color: rgba(255,255,255,0.65); line-height: 1; text-align: center; }
+.cell .num { font-size: 8px; color: rgba(255,255,255,0.7); line-height: 1; font-family: 'Space Mono', monospace; }
+.cell .sym { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.1; font-family: 'Space Mono', monospace; }
+.cell .nm  { font-size: 7px; color: rgba(255,255,255,0.85); line-height: 1.1; text-align: center; }
 .period-lbl {
   display: flex; align-items: center; justify-content: center;
   font-size: 9px; color: var(--txt3); font-family: 'Space Mono', monospace;
@@ -172,7 +172,7 @@ h1 {
 .placeholder { font-size: 13px; color: var(--txt3); }
 
 /* ── Editor Panel ── */
-#theme-btn, #edit-btn {
+#lang-btn, #theme-btn, #edit-btn {
   background: var(--bg2);
   border: 1px solid var(--border);
   color: var(--txt2);
@@ -183,8 +183,8 @@ h1 {
   cursor: pointer;
   transition: all 0.15s;
 }
-#theme-btn { margin-left: auto; }
-#theme-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,0.08); }
+#lang-btn { margin-left: auto; }
+#lang-btn:hover, #theme-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,0.08); }
 #edit-btn:hover, #edit-btn.open { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,0.08); }
 
 #editor-panel {
@@ -247,6 +247,7 @@ h1 {
   <button class="filter-btn" data-cat="metalloid">Metalloid</button>
   <button class="filter-btn" data-cat="lanthanide">Lanthanide</button>
   <button class="filter-btn" data-cat="actinide">Actinide</button>
+  <button id="lang-btn">中文</button>
   <button id="theme-btn">☀ Light</button>
   <button id="edit-btn">✏ Edit</button>
 </div>
@@ -319,6 +320,43 @@ h1 {
 <div id="detail"><p class="placeholder">← Click any element to view its properties</p></div>
 
 <script>
+let lang = 'en';
+
+const CN_NAMES = {
+  1:'氢',2:'氦',3:'锂',4:'铍',5:'硼',6:'碳',7:'氮',8:'氧',9:'氟',10:'氖',
+  11:'钠',12:'镁',13:'铝',14:'硅',15:'磷',16:'硫',17:'氯',18:'氩',19:'钾',20:'钙',
+  21:'钪',22:'钛',23:'钒',24:'铬',25:'锰',26:'铁',27:'钴',28:'镍',29:'铜',30:'锌',
+  31:'镓',32:'锗',33:'砷',34:'硒',35:'溴',36:'氪',37:'铷',38:'锶',39:'钇',40:'锆',
+  41:'铌',42:'钼',43:'锝',44:'钌',45:'铑',46:'钯',47:'银',48:'镉',49:'铟',50:'锡',
+  51:'锑',52:'碲',53:'碘',54:'氙',55:'铯',56:'钡',57:'镧',58:'铈',59:'镨',60:'钕',
+  61:'钷',62:'钐',63:'铕',64:'钆',65:'铽',66:'镝',67:'钬',68:'铒',69:'铥',70:'镱',
+  71:'镥',72:'铪',73:'钽',74:'钨',75:'铼',76:'锇',77:'铱',78:'铂',79:'金',80:'汞',
+  81:'铊',82:'铅',83:'铋',84:'钋',85:'砹',86:'氡',87:'钫',88:'镭',89:'锕',90:'钍',
+  91:'镤',92:'铀',93:'镎',94:'钚',95:'镅',96:'锔',97:'锫',98:'锎',99:'锿',100:'镄',
+  101:'钔',102:'锘',103:'铹',104:'𬬻',105:'𬭊',106:'𬭳',107:'𬭛',108:'𬭶',109:'鿏',110:'𫟼',
+  111:'𬬭',112:'鎶',113:'鉨',114:'𫓧',115:'镆',116:'鉝',117:'鿬',118:'鿫'
+};
+
+const CAT_LABEL_ZH = {
+  nonmetal:'非金属', noble:'稀有气体', alkali:'碱金属',
+  alkaline:'碱土金属', transition:'过渡金属',
+  posttrans:'后过渡金属', metalloid:'类金属',
+  lanthanide:'镧系元素', actinide:'锕系元素'
+};
+
+const UI_ZH = {
+  title:'元素周期表', subtitle:'118种元素 · 点击查看详情 · 按类别筛选',
+  search:'搜索名称、符号或原子序数…',
+  all:'全部', phase:'相态', period:'周期', group:'族',
+  mass:'相对原子质量', config:'电子构型', placeholder:'← 点击任意元素查看属性'
+};
+const UI_EN = {
+  title:'Periodic Table', subtitle:'118 elements · Click any element for details · Filter by category',
+  search:'Search name, symbol, or number…',
+  all:'All', phase:'Phase (STP)', period:'Period', group:'Group',
+  mass:'Atomic mass', config:'Electron configuration', placeholder:'← Click any element to view its properties'
+};
+
 const CAT_COLORS = {
   nonmetal:'#3b82f6', noble:'#a855f7', alkali:'#ef4444',
   alkaline:'#f97316', transition:'#0891b2', posttrans:'#6b7280',
@@ -508,7 +546,8 @@ function buildGrid() {
       const div = document.createElement('div');
       div.className = 'cell' + (vis ? '' : ' faded') + (selectedEl && selectedEl.n === el.n ? ' selected' : '');
       div.style.cssText = `grid-column:${el.col}; grid-row:${el.row}; background:${CAT_COLORS[el.cat]}cc;`;
-      div.innerHTML = `<span class="num">${el.n}</span><span class="sym">${el.sym}</span><span class="nm">${el.name.length > 8 ? el.name.slice(0,7)+'…' : el.name}</span>`;
+      const nm = lang === 'zh' ? CN_NAMES[el.n] : (el.name.length > 8 ? el.name.slice(0,7)+'…' : el.name);
+      div.innerHTML = `<span class="num">${el.n}</span><span class="sym">${el.sym}</span><span class="nm">${nm}</span>`;
       div.addEventListener('click', () => { selectedEl = el; buildGrid(); showDetail(el); });
       grid.appendChild(div);
     }
@@ -517,6 +556,9 @@ function buildGrid() {
 
 function showDetail(el) {
   const color = CAT_COLORS[el.cat];
+  const ui = lang === 'zh' ? UI_ZH : UI_EN;
+  const catLabel = lang === 'zh' ? CAT_LABEL_ZH[el.cat] : CAT_LABEL[el.cat];
+  const elName = lang === 'zh' ? `${CN_NAMES[el.n]} ${el.name}` : el.name;
   document.getElementById('detail').innerHTML = `
     <div class="el-big" style="background:${color}cc;">
       <span class="b-num">${el.n}</span>
@@ -524,15 +566,15 @@ function showDetail(el) {
       <span class="b-mass">${el.mass}</span>
     </div>
     <div class="el-info">
-      <h2>${el.name}</h2>
-      <span class="cat-badge" style="background:${color}25;color:${color}">${CAT_LABEL[el.cat]}</span>
+      <h2>${elName}</h2>
+      <span class="cat-badge" style="background:${color}25;color:${color}">${catLabel}</span>
       <p class="desc">${el.desc}</p>
       <div class="props">
-        <div class="prop"><div class="lbl">Atomic mass</div><div class="val">${el.mass}</div></div>
-        <div class="prop"><div class="lbl">Phase (STP)</div><div class="val">${el.phase}</div></div>
-        <div class="prop"><div class="lbl">Period</div><div class="val">${el.period}</div></div>
-        <div class="prop"><div class="lbl">Group</div><div class="val">${el.group}</div></div>
-        <div class="prop" style="grid-column:span 2"><div class="lbl">Electron configuration</div><div class="val" style="font-size:11px">${el.config}</div></div>
+        <div class="prop"><div class="lbl">${ui.mass}</div><div class="val">${el.mass}</div></div>
+        <div class="prop"><div class="lbl">${ui.phase}</div><div class="val">${el.phase}</div></div>
+        <div class="prop"><div class="lbl">${ui.period}</div><div class="val">${el.period}</div></div>
+        <div class="prop"><div class="lbl">${ui.group}</div><div class="val">${el.group}</div></div>
+        <div class="prop" style="grid-column:span 2"><div class="lbl">${ui.config}</div><div class="val" style="font-size:11px">${el.config}</div></div>
       </div>
     </div>
   `;
@@ -540,7 +582,9 @@ function showDetail(el) {
 
 function buildLegend() {
   const leg = document.getElementById('legend');
-  Object.entries(CAT_LABEL).forEach(([k,v]) => {
+  leg.innerHTML = '';
+  const labels = lang === 'zh' ? CAT_LABEL_ZH : CAT_LABEL;
+  Object.entries(labels).forEach(([k,v]) => {
     const d = document.createElement('div');
     d.className = 'leg';
     d.innerHTML = `<div class="leg-dot" style="background:${CAT_COLORS[k]}"></div>${v}`;
@@ -551,6 +595,21 @@ function buildLegend() {
     });
     leg.appendChild(d);
   });
+}
+
+function applyLang() {
+  const ui = lang === 'zh' ? UI_ZH : UI_EN;
+  document.querySelector('h1').textContent = ui.title;
+  document.querySelector('.subtitle').textContent = ui.subtitle;
+  document.getElementById('search').placeholder = ui.search;
+  document.querySelector('.filter-btn[data-cat="all"]').textContent = ui.all;
+  document.getElementById('ed-title').value = ui.title;
+  document.getElementById('ed-subtitle').value = ui.subtitle;
+  const ph = document.querySelector('#detail .placeholder');
+  if (ph) ph.textContent = ui.placeholder;
+  buildGrid();
+  buildLegend();
+  if (selectedEl) showDetail(selectedEl);
 }
 
 document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -620,6 +679,12 @@ function resetAll() {
   buildGrid();
   buildLegend();
 }
+
+document.getElementById('lang-btn').addEventListener('click', function() {
+  lang = lang === 'en' ? 'zh' : 'en';
+  this.textContent = lang === 'zh' ? 'EN' : '中文';
+  applyLang();
+});
 
 document.getElementById('theme-btn').addEventListener('click', function() {
   const root = document.documentElement;
