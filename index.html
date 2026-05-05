@@ -22,6 +22,20 @@
   --element-muted: rgba(255,255,255,0.82);
   --element-subtle: rgba(255,255,255,0.68);
   --surface-shadow: 0 18px 50px rgba(0,0,0,0.22);
+  --fs-body: 16px;
+  --fs-title: 30px;
+  --fs-subtitle: 15px;
+  --fs-control: 13px;
+  --fs-input: 15px;
+  --fs-cell-num: 10px;
+  --fs-cell-symbol: 22px;
+  --fs-cell-name: 9px;
+  --fs-ref: 10px;
+  --fs-detail-symbol: 34px;
+  --fs-detail-title: 24px;
+  --fs-detail-body: 15px;
+  --fs-detail-label: 12px;
+  --fs-editor: 14px;
 
   --nonmetal:   #3b82f6;
   --noble:      #a855f7;
@@ -54,17 +68,17 @@ body {
   font-family: 'IBM Plex Sans', sans-serif;
   min-height: 100vh;
   padding: 24px;
-  font-size: 16px;
+  font-size: var(--fs-body);
   line-height: 1.5;
 }
 h1 {
   font-family: 'Space Mono', monospace;
-  font-size: 30px;
+  font-size: var(--fs-title);
   letter-spacing: 0;
   color: var(--accent);
   margin-bottom: 6px;
 }
-.subtitle { font-size: 15px; color: var(--txt2); margin-bottom: 18px; }
+.subtitle { font-size: var(--fs-subtitle); color: var(--txt2); margin-bottom: 18px; }
 
 #controls {
   display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
@@ -76,7 +90,7 @@ h1 {
   color: var(--txt);
   padding: 9px 13px;
   border-radius: 8px;
-  font-size: 15px;
+  font-size: var(--fs-input);
   font-family: inherit;
   width: min(280px, 100%);
   outline: none;
@@ -90,7 +104,7 @@ h1 {
   color: var(--txt2);
   padding: 7px 12px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: var(--fs-control);
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -135,14 +149,14 @@ h1 {
 }
 .cell.faded { opacity: 0.18; }
 .cell .num {
-  font-size: 10px;
+  font-size: var(--fs-cell-num);
   color: var(--element-subtle);
   line-height: 1;
   font-family: 'Space Mono', monospace;
   align-self: flex-start;
 }
 .cell .sym {
-  font-size: 22px;
+  font-size: var(--fs-cell-symbol);
   font-weight: 700;
   color: var(--element-text);
   line-height: 1;
@@ -154,7 +168,7 @@ h1 {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 9px;
+  font-size: var(--fs-cell-name);
   font-weight: 600;
   color: var(--element-muted);
   line-height: 1.15;
@@ -162,13 +176,13 @@ h1 {
 }
 .period-lbl {
   display: flex; align-items: center; justify-content: center;
-  font-size: 11px; color: var(--txt3); font-family: 'Space Mono', monospace;
+  font-size: var(--fs-detail-label); color: var(--txt3); font-family: 'Space Mono', monospace;
 }
 .lan-ref, .act-ref {
   display: flex; align-items: center; justify-content: center;
   min-width: 60px;
   min-height: 60px;
-  font-size: 10px; color: var(--txt2); border-radius: 7px;
+  font-size: var(--fs-ref); color: var(--txt2); border-radius: 7px;
   border: 1px dashed var(--border-strong);
 }
 
@@ -194,30 +208,30 @@ h1 {
   color: var(--element-text);
   text-shadow: 0 1px 1px rgba(0,0,0,0.28);
 }
-.el-big .b-num { font-size: 12px; color: var(--element-subtle); font-family: 'Space Mono', monospace; }
-.el-big .b-sym { font-size: 34px; font-weight: 700; color: var(--element-text); font-family: 'Space Mono', monospace; line-height: 1.1; }
-.el-big .b-mass { font-size: 11px; color: var(--element-muted); font-family: 'Space Mono', monospace; }
+.el-big .b-num { font-size: var(--fs-detail-label); color: var(--element-subtle); font-family: 'Space Mono', monospace; }
+.el-big .b-sym { font-size: var(--fs-detail-symbol); font-weight: 700; color: var(--element-text); font-family: 'Space Mono', monospace; line-height: 1.1; }
+.el-big .b-mass { font-size: var(--fs-ref); color: var(--element-muted); font-family: 'Space Mono', monospace; }
 .el-info { flex: 1; min-width: 0; }
-.el-info h2 { font-size: 24px; font-weight: 600; color: var(--txt); margin-bottom: 4px; }
+.el-info h2 { font-size: var(--fs-detail-title); font-weight: 600; color: var(--txt); margin-bottom: 4px; }
 .el-info .cat-badge {
   display: inline-block;
-  font-size: 12px; padding: 3px 9px; border-radius: 999px;
+  font-size: var(--fs-detail-label); padding: 3px 9px; border-radius: 999px;
   background: var(--accent-soft); color: var(--accent);
   margin-bottom: 8px; font-family: 'Space Mono', monospace;
 }
-.el-info .desc { font-size: 15px; color: var(--txt2); line-height: 1.65; margin-bottom: 12px; }
+.el-info .desc { font-size: var(--fs-detail-body); color: var(--txt2); line-height: 1.65; margin-bottom: 12px; }
 .props { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 10px; }
 .prop { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
-.prop .lbl { font-size: 12px; color: var(--txt3); margin-bottom: 4px; }
-.prop .val { font-size: 15px; font-weight: 600; color: var(--txt); font-family: 'Space Mono', monospace; overflow-wrap: anywhere; }
+.prop .lbl { font-size: var(--fs-detail-label); color: var(--txt3); margin-bottom: 4px; }
+.prop .val { font-size: var(--fs-detail-body); font-weight: 600; color: var(--txt); font-family: 'Space Mono', monospace; overflow-wrap: anywhere; }
 
 #legend {
   display: flex; flex-wrap: wrap; gap: 8px;
   margin: 16px 0 0;
 }
-.leg { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--txt2); cursor: pointer; }
+.leg { display: flex; align-items: center; gap: 6px; font-size: var(--fs-control); color: var(--txt2); cursor: pointer; }
 .leg-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.35); }
-.placeholder { font-size: 15px; color: var(--txt3); }
+.placeholder { font-size: var(--fs-detail-body); color: var(--txt3); }
 
 /* ── Editor Panel ── */
 #lang-btn, #theme-btn, #edit-btn {
@@ -226,7 +240,7 @@ h1 {
   color: var(--txt2);
   padding: 7px 12px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: var(--fs-control);
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
@@ -251,7 +265,7 @@ h1 {
 .ed-tabs { display: flex; gap: 4px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
 .ed-tab {
   background: none; border: none; color: var(--txt3);
-  font-size: 13px; font-family: inherit; cursor: pointer;
+  font-size: var(--fs-control); font-family: inherit; cursor: pointer;
   padding: 6px 12px; border-radius: 7px; transition: all 0.15s;
 }
 .ed-tab:hover { color: var(--txt); background: var(--bg3); }
@@ -261,10 +275,10 @@ h1 {
 .ed-pane.active { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 
 .ed-field { display: flex; flex-direction: column; gap: 5px; }
-.ed-field label { font-size: 11px; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.05em; }
+.ed-field label { font-size: var(--fs-ref); color: var(--txt3); text-transform: uppercase; letter-spacing: 0.05em; }
 .ed-field input[type=text], .ed-field select {
   background: var(--bg3); border: 1px solid var(--border); color: var(--txt);
-  padding: 8px 10px; border-radius: 7px; font-size: 14px; font-family: inherit; outline: none;
+  padding: 8px 10px; border-radius: 7px; font-size: var(--fs-editor); font-family: inherit; outline: none;
 }
 .ed-field input[type=text]:focus, .ed-field select:focus { border-color: var(--accent); }
 .ed-field input[type=color] {
@@ -274,7 +288,7 @@ h1 {
 .ed-field input[type=range] { width: 100%; accent-color: var(--accent); }
 .ed-reset {
   background: none; border: 1px solid var(--border); color: var(--txt3);
-  padding: 7px 14px; border-radius: 7px; font-size: 13px; font-family: inherit;
+  padding: 7px 14px; border-radius: 7px; font-size: var(--fs-control); font-family: inherit;
   cursor: pointer; transition: all 0.15s; margin-top: 4px;
 }
 .ed-reset:hover { border-color: #ef4444; color: #ef4444; }
@@ -285,7 +299,7 @@ h1 {
 
 @media (max-width: 760px) {
   body { padding: 14px; }
-  h1 { font-size: 26px; }
+  h1 { font-size: max(26px, var(--fs-title)); }
   #controls { align-items: stretch; }
   #search { width: 100%; }
   #lang-btn { margin-left: 0; }
@@ -358,7 +372,7 @@ h1 {
     <div class="ed-field">
       <label>Base font size: <span id="fs-val">16</span>px</label>
       <input type="range" id="ed-fontsize" min="14" max="24" value="16"
-        oninput="document.getElementById('fs-val').textContent=this.value; document.body.style.fontSize=this.value+'px'" />
+        oninput="applyFontSize(this.value)" />
     </div>
   </div>
 
@@ -596,7 +610,7 @@ function buildGrid() {
           const ref = document.createElement('div');
           ref.className = r === 6 ? 'lan-ref' : 'act-ref';
           ref.style.cssText = `grid-column:${c}; grid-row:${r}; background:${r===6 ? CAT_COLORS.lanthanide : CAT_COLORS.actinide}22; border-color:${r===6 ? CAT_COLORS.lanthanide : CAT_COLORS.actinide}55;`;
-          ref.innerHTML = `<span style="color:${r===6 ? CAT_COLORS.lanthanide : CAT_COLORS.actinide};font-size:10px;font-weight:700;font-family:'Space Mono',monospace">${r===6?'57-71':'89-103'}</span>`;
+          ref.innerHTML = `<span style="color:${r===6 ? CAT_COLORS.lanthanide : CAT_COLORS.actinide};font-size:var(--fs-ref);font-weight:700;font-family:'Space Mono',monospace">${r===6?'57-71':'89-103'}</span>`;
           grid.appendChild(ref);
           continue;
         }
@@ -640,7 +654,7 @@ function showDetail(el) {
         <div class="prop"><div class="lbl">${ui.phase}</div><div class="val">${el.phase}</div></div>
         <div class="prop"><div class="lbl">${ui.period}</div><div class="val">${el.period}</div></div>
         <div class="prop"><div class="lbl">${ui.group}</div><div class="val">${el.group}</div></div>
-        <div class="prop" style="grid-column:span 2"><div class="lbl">${ui.config}</div><div class="val" style="font-size:13px">${el.config}</div></div>
+        <div class="prop" style="grid-column:span 2"><div class="lbl">${ui.config}</div><div class="val" style="font-size:var(--fs-control)">${el.config}</div></div>
       </div>
     </div>
   `;
@@ -717,6 +731,34 @@ function applyFonts() {
   document.querySelectorAll('h1').forEach(el => el.style.fontFamily = document.getElementById('ed-font-head').value);
 }
 
+const FONT_SIZE_BASES = {
+  '--fs-body': 16,
+  '--fs-title': 30,
+  '--fs-subtitle': 15,
+  '--fs-control': 13,
+  '--fs-input': 15,
+  '--fs-cell-num': 10,
+  '--fs-cell-symbol': 22,
+  '--fs-cell-name': 9,
+  '--fs-ref': 10,
+  '--fs-detail-symbol': 34,
+  '--fs-detail-title': 24,
+  '--fs-detail-body': 15,
+  '--fs-detail-label': 12,
+  '--fs-editor': 14
+};
+
+function applyFontSize(value) {
+  const baseSize = Number(value);
+  const scale = baseSize / 16;
+  const root = document.documentElement;
+  Object.entries(FONT_SIZE_BASES).forEach(([name, base]) => {
+    const scaled = Math.max(8, base * scale);
+    root.style.setProperty(name, `${scaled.toFixed(1)}px`);
+  });
+  document.getElementById('fs-val').textContent = String(baseSize);
+}
+
 function resetAll() {
   // Reset CSS vars
   ['--bg','--bg2','--accent','--txt'].forEach(v => {
@@ -731,12 +773,11 @@ function resetAll() {
   });
   // Reset fonts
   document.body.style.fontFamily = '';
-  document.body.style.fontSize = '';
   document.querySelectorAll('h1').forEach(el => el.style.fontFamily = '');
   document.getElementById('ed-font-body').value = "'IBM Plex Sans', sans-serif";
   document.getElementById('ed-font-head').value = "'Space Mono', monospace";
   document.getElementById('ed-fontsize').value = 16;
-  document.getElementById('fs-val').textContent = 16;
+  applyFontSize(16);
   // Reset content
   document.querySelector('h1').textContent = 'Periodic Table';
   document.querySelector('.subtitle').textContent = '118 elements · Click any element for details · Filter by category';
