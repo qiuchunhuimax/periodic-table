@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Interactive Periodic Table</title>
+<link rel="icon" href="data:,">
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -14,7 +15,13 @@
   --txt2: #94a3b8;
   --txt3: #64748b;
   --accent: #38bdf8;
+  --accent-soft: rgba(56,189,248,0.14);
   --border: rgba(148,163,184,0.12);
+  --border-strong: rgba(226,232,240,0.18);
+  --element-text: #ffffff;
+  --element-muted: rgba(255,255,255,0.82);
+  --element-subtle: rgba(255,255,255,0.68);
+  --surface-shadow: 0 18px 50px rgba(0,0,0,0.22);
 
   --nonmetal:   #3b82f6;
   --noble:      #a855f7;
@@ -28,14 +35,17 @@
   --unknown:    #475569;
 }
 :root[data-theme="light"] {
-  --bg: #f0f4f8;
+  --bg: #f6f8fb;
   --bg2: #ffffff;
-  --bg3: #e2e8f0;
-  --txt: #1e293b;
-  --txt2: #475569;
-  --txt3: #94a3b8;
-  --accent: #0284c7;
-  --border: rgba(30,41,59,0.12);
+  --bg3: #eef3f9;
+  --txt: #0f172a;
+  --txt2: #334155;
+  --txt3: #64748b;
+  --accent: #0369a1;
+  --accent-soft: rgba(3,105,161,0.12);
+  --border: rgba(15,23,42,0.16);
+  --border-strong: rgba(15,23,42,0.24);
+  --surface-shadow: 0 18px 42px rgba(15,23,42,0.10);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
@@ -43,166 +53,206 @@ body {
   color: var(--txt);
   font-family: 'IBM Plex Sans', sans-serif;
   min-height: 100vh;
-  padding: 20px;
+  padding: 24px;
+  font-size: 16px;
+  line-height: 1.5;
 }
 h1 {
   font-family: 'Space Mono', monospace;
-  font-size: 22px;
-  letter-spacing: -0.5px;
+  font-size: 30px;
+  letter-spacing: 0;
   color: var(--accent);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
-.subtitle { font-size: 13px; color: var(--txt2); margin-bottom: 16px; }
+.subtitle { font-size: 15px; color: var(--txt2); margin-bottom: 18px; }
 
 #controls {
-  display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
-  margin-bottom: 14px;
+  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  margin-bottom: 18px;
 }
 #search {
   background: var(--bg2);
   border: 1px solid var(--border);
   color: var(--txt);
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 13px;
+  padding: 9px 13px;
+  border-radius: 8px;
+  font-size: 15px;
   font-family: inherit;
-  width: 200px;
+  width: min(280px, 100%);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
-#search:focus { border-color: var(--accent); }
+#search:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 #search::placeholder { color: var(--txt3); }
 .filter-btn {
   background: var(--bg2);
   border: 1px solid var(--border);
   color: var(--txt2);
-  padding: 5px 11px;
-  border-radius: 20px;
-  font-size: 11px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: all 0.15s;
 }
-.filter-btn:hover { border-color: var(--accent); color: var(--accent); }
-.filter-btn.active { border-color: var(--accent); background: rgba(56,189,248,0.12); color: var(--accent); }
+.filter-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.filter-btn.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
 
 #pt-grid {
   display: grid;
-  grid-template-columns: repeat(18, 1fr);
-  gap: 2px;
-  width: 100%;
+  grid-template-columns: repeat(18, minmax(60px, 1fr));
+  gap: 4px;
+  width: max(100%, 1148px);
+  overflow: visible;
 }
 .cell {
   aspect-ratio: 1;
-  border-radius: 4px;
+  min-width: 60px;
+  min-height: 60px;
+  border-radius: 7px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   position: relative;
-  transition: transform 0.1s, opacity 0.2s, box-shadow 0.15s;
-  border: 1px solid rgba(255,255,255,0.06);
+  gap: 1px;
+  padding: 4px 3px;
+  transition: transform 0.1s, opacity 0.2s, box-shadow 0.15s, border-color 0.15s;
+  border: 1px solid rgba(255,255,255,0.22);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.18), 0 1px 2px rgba(0,0,0,0.14);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.28);
 }
 .cell:hover {
-  transform: scale(1.25);
+  transform: scale(1.12);
   z-index: 20;
-  box-shadow: 0 0 12px rgba(56,189,248,0.5);
-  border-color: rgba(56,189,248,0.6);
+  box-shadow: 0 10px 28px rgba(15,23,42,0.28), 0 0 0 3px var(--accent-soft);
+  border-color: rgba(255,255,255,0.55);
 }
 .cell.selected {
-  box-shadow: 0 0 0 2px var(--accent);
+  box-shadow: 0 0 0 3px var(--accent), 0 12px 28px rgba(15,23,42,0.26);
 }
-.cell.faded { opacity: 0.12; }
-.cell .num { font-size: 8px; color: rgba(255,255,255,0.7); line-height: 1; font-family: 'Space Mono', monospace; }
-.cell .sym { font-size: 15px; font-weight: 700; color: #fff; line-height: 1.1; font-family: 'Space Mono', monospace; }
-.cell .nm  { font-size: 7px; color: rgba(255,255,255,0.85); line-height: 1.1; text-align: center; }
+.cell.faded { opacity: 0.18; }
+.cell .num {
+  font-size: 10px;
+  color: var(--element-subtle);
+  line-height: 1;
+  font-family: 'Space Mono', monospace;
+  align-self: flex-start;
+}
+.cell .sym {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--element-text);
+  line-height: 1;
+  font-family: 'Space Mono', monospace;
+}
+.cell .nm  {
+  width: 100%;
+  min-height: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--element-muted);
+  line-height: 1.15;
+  text-align: center;
+}
 .period-lbl {
   display: flex; align-items: center; justify-content: center;
-  font-size: 9px; color: var(--txt3); font-family: 'Space Mono', monospace;
+  font-size: 11px; color: var(--txt3); font-family: 'Space Mono', monospace;
 }
 .lan-ref, .act-ref {
   display: flex; align-items: center; justify-content: center;
-  font-size: 7px; color: var(--txt3); border-radius: 3px;
-  border: 1px dashed rgba(148,163,184,0.2);
+  min-width: 60px;
+  min-height: 60px;
+  font-size: 10px; color: var(--txt2); border-radius: 7px;
+  border: 1px dashed var(--border-strong);
 }
 
 #detail {
-  margin-top: 14px;
+  margin-top: 18px;
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px 20px;
-  min-height: 100px;
+  border-radius: 10px;
+  padding: 18px 20px;
+  min-height: 118px;
   display: flex;
   gap: 20px;
   align-items: flex-start;
+  box-shadow: var(--surface-shadow);
 }
 .el-big {
-  width: 72px; height: 72px;
-  border-radius: 8px;
+  width: 92px; height: 92px;
+  border-radius: 10px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.28);
+  color: var(--element-text);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.28);
 }
-.el-big .b-num { font-size: 10px; color: rgba(255,255,255,0.7); font-family: 'Space Mono', monospace; }
-.el-big .b-sym { font-size: 26px; font-weight: 700; color: #fff; font-family: 'Space Mono', monospace; line-height: 1.1; }
-.el-big .b-mass { font-size: 9px; color: rgba(255,255,255,0.65); font-family: 'Space Mono', monospace; }
+.el-big .b-num { font-size: 12px; color: var(--element-subtle); font-family: 'Space Mono', monospace; }
+.el-big .b-sym { font-size: 34px; font-weight: 700; color: var(--element-text); font-family: 'Space Mono', monospace; line-height: 1.1; }
+.el-big .b-mass { font-size: 11px; color: var(--element-muted); font-family: 'Space Mono', monospace; }
 .el-info { flex: 1; min-width: 0; }
-.el-info h2 { font-size: 20px; font-weight: 600; color: var(--txt); margin-bottom: 2px; }
+.el-info h2 { font-size: 24px; font-weight: 600; color: var(--txt); margin-bottom: 4px; }
 .el-info .cat-badge {
   display: inline-block;
-  font-size: 10px; padding: 2px 8px; border-radius: 10px;
-  background: rgba(56,189,248,0.12); color: var(--accent);
+  font-size: 12px; padding: 3px 9px; border-radius: 999px;
+  background: var(--accent-soft); color: var(--accent);
   margin-bottom: 8px; font-family: 'Space Mono', monospace;
 }
-.el-info .desc { font-size: 13px; color: var(--txt2); line-height: 1.6; margin-bottom: 10px; }
-.props { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; }
-.prop { background: var(--bg3); border-radius: 6px; padding: 8px 10px; }
-.prop .lbl { font-size: 10px; color: var(--txt3); margin-bottom: 3px; }
-.prop .val { font-size: 13px; font-weight: 500; color: var(--txt); font-family: 'Space Mono', monospace; }
+.el-info .desc { font-size: 15px; color: var(--txt2); line-height: 1.65; margin-bottom: 12px; }
+.props { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); gap: 10px; }
+.prop { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.prop .lbl { font-size: 12px; color: var(--txt3); margin-bottom: 4px; }
+.prop .val { font-size: 15px; font-weight: 600; color: var(--txt); font-family: 'Space Mono', monospace; overflow-wrap: anywhere; }
 
 #legend {
   display: flex; flex-wrap: wrap; gap: 8px;
-  margin: 12px 0 0;
+  margin: 16px 0 0;
 }
-.leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--txt2); cursor: pointer; }
-.leg-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-.placeholder { font-size: 13px; color: var(--txt3); }
+.leg { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--txt2); cursor: pointer; }
+.leg-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; border: 1px solid rgba(255,255,255,0.35); }
+.placeholder { font-size: 15px; color: var(--txt3); }
 
 /* ── Editor Panel ── */
 #lang-btn, #theme-btn, #edit-btn {
   background: var(--bg2);
   border: 1px solid var(--border);
   color: var(--txt2);
-  padding: 5px 12px;
-  border-radius: 20px;
-  font-size: 11px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: all 0.15s;
 }
 #lang-btn { margin-left: auto; }
-#lang-btn:hover, #theme-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,0.08); }
-#edit-btn:hover, #edit-btn.open { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,0.08); }
+#lang-btn:hover, #theme-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+#edit-btn:hover, #edit-btn.open { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 
 #editor-panel {
   display: none;
   background: var(--bg2);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 10px;
   padding: 16px;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
   gap: 16px;
+  box-shadow: var(--surface-shadow);
 }
 #editor-panel.visible { display: block; }
 
 .ed-tabs { display: flex; gap: 4px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
 .ed-tab {
   background: none; border: none; color: var(--txt3);
-  font-size: 12px; font-family: inherit; cursor: pointer;
-  padding: 4px 12px; border-radius: 6px; transition: all 0.15s;
+  font-size: 13px; font-family: inherit; cursor: pointer;
+  padding: 6px 12px; border-radius: 7px; transition: all 0.15s;
 }
 .ed-tab:hover { color: var(--txt); background: var(--bg3); }
 .ed-tab.active { color: var(--accent); background: rgba(56,189,248,0.1); }
@@ -211,10 +261,10 @@ h1 {
 .ed-pane.active { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
 
 .ed-field { display: flex; flex-direction: column; gap: 5px; }
-.ed-field label { font-size: 10px; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.05em; }
+.ed-field label { font-size: 11px; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.05em; }
 .ed-field input[type=text], .ed-field select {
   background: var(--bg3); border: 1px solid var(--border); color: var(--txt);
-  padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: inherit; outline: none;
+  padding: 8px 10px; border-radius: 7px; font-size: 14px; font-family: inherit; outline: none;
 }
 .ed-field input[type=text]:focus, .ed-field select:focus { border-color: var(--accent); }
 .ed-field input[type=color] {
@@ -224,10 +274,24 @@ h1 {
 .ed-field input[type=range] { width: 100%; accent-color: var(--accent); }
 .ed-reset {
   background: none; border: 1px solid var(--border); color: var(--txt3);
-  padding: 5px 14px; border-radius: 6px; font-size: 11px; font-family: inherit;
+  padding: 7px 14px; border-radius: 7px; font-size: 13px; font-family: inherit;
   cursor: pointer; transition: all 0.15s; margin-top: 4px;
 }
 .ed-reset:hover { border-color: #ef4444; color: #ef4444; }
+
+@media (max-width: 1200px) {
+  body { padding: 18px; overflow-x: auto; }
+}
+
+@media (max-width: 760px) {
+  body { padding: 14px; }
+  h1 { font-size: 26px; }
+  #controls { align-items: stretch; }
+  #search { width: 100%; }
+  #lang-btn { margin-left: 0; }
+  #detail { flex-direction: column; padding: 16px; }
+  .props { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
@@ -293,7 +357,7 @@ h1 {
     </div>
     <div class="ed-field">
       <label>Base font size: <span id="fs-val">16</span>px</label>
-      <input type="range" id="ed-fontsize" min="12" max="22" value="16"
+      <input type="range" id="ed-fontsize" min="14" max="24" value="16"
         oninput="document.getElementById('fs-val').textContent=this.value; document.body.style.fontSize=this.value+'px'" />
     </div>
   </div>
@@ -532,7 +596,7 @@ function buildGrid() {
           const ref = document.createElement('div');
           ref.className = r === 6 ? 'lan-ref' : 'act-ref';
           ref.style.cssText = `grid-column:${c}; grid-row:${r}; background:${r===6 ? CAT_COLORS.lanthanide : CAT_COLORS.actinide}22; border-color:${r===6 ? CAT_COLORS.lanthanide : CAT_COLORS.actinide}55;`;
-          ref.innerHTML = `<span style="color:${r===6 ? CAT_COLORS.lanthanide : CAT_COLORS.actinide};font-size:7px;font-family:'Space Mono',monospace">${r===6?'57-71':'89-103'}</span>`;
+          ref.innerHTML = `<span style="color:${r===6 ? CAT_COLORS.lanthanide : CAT_COLORS.actinide};font-size:10px;font-weight:700;font-family:'Space Mono',monospace">${r===6?'57-71':'89-103'}</span>`;
           grid.appendChild(ref);
           continue;
         }
@@ -545,8 +609,10 @@ function buildGrid() {
       const vis = isVisible(el);
       const div = document.createElement('div');
       div.className = 'cell' + (vis ? '' : ' faded') + (selectedEl && selectedEl.n === el.n ? ' selected' : '');
-      div.style.cssText = `grid-column:${el.col}; grid-row:${el.row}; background:${CAT_COLORS[el.cat]}cc;`;
-      const nm = lang === 'zh' ? CN_NAMES[el.n] : (el.name.length > 8 ? el.name.slice(0,7)+'…' : el.name);
+      div.style.cssText = `grid-column:${el.col}; grid-row:${el.row}; background:${CAT_COLORS[el.cat]}e6;`;
+      div.title = `${el.n} ${el.sym} ${lang === 'zh' ? CN_NAMES[el.n] + ' / ' : ''}${el.name}`;
+      div.setAttribute('aria-label', div.title);
+      const nm = lang === 'zh' ? CN_NAMES[el.n] : (el.name.length > 10 ? el.name.slice(0,9)+'…' : el.name);
       div.innerHTML = `<span class="num">${el.n}</span><span class="sym">${el.sym}</span><span class="nm">${nm}</span>`;
       div.addEventListener('click', () => { selectedEl = el; buildGrid(); showDetail(el); });
       grid.appendChild(div);
@@ -560,7 +626,7 @@ function showDetail(el) {
   const catLabel = lang === 'zh' ? CAT_LABEL_ZH[el.cat] : CAT_LABEL[el.cat];
   const elName = lang === 'zh' ? `${CN_NAMES[el.n]} ${el.name}` : el.name;
   document.getElementById('detail').innerHTML = `
-    <div class="el-big" style="background:${color}cc;">
+    <div class="el-big" style="background:${color}e6;">
       <span class="b-num">${el.n}</span>
       <span class="b-sym">${el.sym}</span>
       <span class="b-mass">${el.mass}</span>
@@ -574,7 +640,7 @@ function showDetail(el) {
         <div class="prop"><div class="lbl">${ui.phase}</div><div class="val">${el.phase}</div></div>
         <div class="prop"><div class="lbl">${ui.period}</div><div class="val">${el.period}</div></div>
         <div class="prop"><div class="lbl">${ui.group}</div><div class="val">${el.group}</div></div>
-        <div class="prop" style="grid-column:span 2"><div class="lbl">${ui.config}</div><div class="val" style="font-size:11px">${el.config}</div></div>
+        <div class="prop" style="grid-column:span 2"><div class="lbl">${ui.config}</div><div class="val" style="font-size:13px">${el.config}</div></div>
       </div>
     </div>
   `;
