@@ -1,5 +1,17 @@
 # Interactive Periodic Table
 
-A standalone HTML interactive periodic table.
+An interactive periodic table rebuilt with React, TypeScript, and Vite.
 
-Open `index.html` directly, or use GitHub Pages to view it in the browser.
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+## Production build
+
+```bash
+npm run build
+npm run preview
+```
