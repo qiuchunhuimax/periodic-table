@@ -27,6 +27,16 @@
   --actinide:   #d97706;
   --unknown:    #475569;
 }
+:root[data-theme="light"] {
+  --bg: #f0f4f8;
+  --bg2: #ffffff;
+  --bg3: #e2e8f0;
+  --txt: #1e293b;
+  --txt2: #475569;
+  --txt3: #94a3b8;
+  --accent: #0284c7;
+  --border: rgba(30,41,59,0.12);
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   background: var(--bg);
@@ -160,6 +170,64 @@ h1 {
 .leg { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--txt2); cursor: pointer; }
 .leg-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 .placeholder { font-size: 13px; color: var(--txt3); }
+
+/* ── Editor Panel ── */
+#theme-btn, #edit-btn {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--txt2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+#theme-btn { margin-left: auto; }
+#theme-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,0.08); }
+#edit-btn:hover, #edit-btn.open { border-color: var(--accent); color: var(--accent); background: rgba(56,189,248,0.08); }
+
+#editor-panel {
+  display: none;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+  gap: 16px;
+}
+#editor-panel.visible { display: block; }
+
+.ed-tabs { display: flex; gap: 4px; margin-bottom: 14px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.ed-tab {
+  background: none; border: none; color: var(--txt3);
+  font-size: 12px; font-family: inherit; cursor: pointer;
+  padding: 4px 12px; border-radius: 6px; transition: all 0.15s;
+}
+.ed-tab:hover { color: var(--txt); background: var(--bg3); }
+.ed-tab.active { color: var(--accent); background: rgba(56,189,248,0.1); }
+
+.ed-pane { display: none; }
+.ed-pane.active { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+
+.ed-field { display: flex; flex-direction: column; gap: 5px; }
+.ed-field label { font-size: 10px; color: var(--txt3); text-transform: uppercase; letter-spacing: 0.05em; }
+.ed-field input[type=text], .ed-field select {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--txt);
+  padding: 6px 10px; border-radius: 6px; font-size: 12px; font-family: inherit; outline: none;
+}
+.ed-field input[type=text]:focus, .ed-field select:focus { border-color: var(--accent); }
+.ed-field input[type=color] {
+  width: 100%; height: 32px; border: 1px solid var(--border);
+  border-radius: 6px; cursor: pointer; background: var(--bg3); padding: 2px 4px;
+}
+.ed-field input[type=range] { width: 100%; accent-color: var(--accent); }
+.ed-reset {
+  background: none; border: 1px solid var(--border); color: var(--txt3);
+  padding: 5px 14px; border-radius: 6px; font-size: 11px; font-family: inherit;
+  cursor: pointer; transition: all 0.15s; margin-top: 4px;
+}
+.ed-reset:hover { border-color: #ef4444; color: #ef4444; }
 </style>
 </head>
 <body>
@@ -179,6 +247,71 @@ h1 {
   <button class="filter-btn" data-cat="metalloid">Metalloid</button>
   <button class="filter-btn" data-cat="lanthanide">Lanthanide</button>
   <button class="filter-btn" data-cat="actinide">Actinide</button>
+  <button id="theme-btn">☀ Light</button>
+  <button id="edit-btn">✏ Edit</button>
+</div>
+
+<div id="editor-panel">
+  <div class="ed-tabs">
+    <button class="ed-tab active" data-pane="content">Content</button>
+    <button class="ed-tab" data-pane="font">Font</button>
+    <button class="ed-tab" data-pane="colors">Colors</button>
+    <button class="ed-reset" onclick="resetAll()" style="margin-left:auto">Reset all</button>
+  </div>
+
+  <div class="ed-pane active" id="pane-content">
+    <div class="ed-field" style="grid-column:1/-1">
+      <label>Page Title</label>
+      <input type="text" id="ed-title" value="Periodic Table" oninput="document.querySelector('h1').textContent=this.value" />
+    </div>
+    <div class="ed-field" style="grid-column:1/-1">
+      <label>Subtitle</label>
+      <input type="text" id="ed-subtitle" value="118 elements · Click any element for details · Filter by category" oninput="document.querySelector('.subtitle').textContent=this.value" />
+    </div>
+  </div>
+
+  <div class="ed-pane" id="pane-font">
+    <div class="ed-field">
+      <label>UI Font</label>
+      <select id="ed-font-body" onchange="applyFonts()">
+        <option value="'IBM Plex Sans', sans-serif">IBM Plex Sans</option>
+        <option value="'Inter', sans-serif">Inter</option>
+        <option value="'Space Mono', monospace">Space Mono</option>
+        <option value="system-ui, sans-serif">System UI</option>
+        <option value="Georgia, serif">Georgia</option>
+      </select>
+    </div>
+    <div class="ed-field">
+      <label>Heading Font</label>
+      <select id="ed-font-head" onchange="applyFonts()">
+        <option value="'Space Mono', monospace">Space Mono</option>
+        <option value="'IBM Plex Sans', sans-serif">IBM Plex Sans</option>
+        <option value="'Inter', sans-serif">Inter</option>
+        <option value="Georgia, serif">Georgia</option>
+      </select>
+    </div>
+    <div class="ed-field">
+      <label>Base font size: <span id="fs-val">16</span>px</label>
+      <input type="range" id="ed-fontsize" min="12" max="22" value="16"
+        oninput="document.getElementById('fs-val').textContent=this.value; document.body.style.fontSize=this.value+'px'" />
+    </div>
+  </div>
+
+  <div class="ed-pane" id="pane-colors">
+    <div class="ed-field"><label>Background</label><input type="color" id="c-bg" value="#0a0e17" oninput="setVar('--bg',this.value)"></div>
+    <div class="ed-field"><label>Card BG</label><input type="color" id="c-bg2" value="#111827" oninput="setVar('--bg2',this.value)"></div>
+    <div class="ed-field"><label>Accent</label><input type="color" id="c-accent" value="#38bdf8" oninput="setVar('--accent',this.value)"></div>
+    <div class="ed-field"><label>Text</label><input type="color" id="c-txt" value="#e2e8f0" oninput="setVar('--txt',this.value)"></div>
+    <div class="ed-field"><label>Nonmetal</label><input type="color" id="c-nonmetal" value="#3b82f6" oninput="setCatColor('nonmetal',this.value)"></div>
+    <div class="ed-field"><label>Noble gas</label><input type="color" id="c-noble" value="#a855f7" oninput="setCatColor('noble',this.value)"></div>
+    <div class="ed-field"><label>Alkali metal</label><input type="color" id="c-alkali" value="#ef4444" oninput="setCatColor('alkali',this.value)"></div>
+    <div class="ed-field"><label>Alkaline earth</label><input type="color" id="c-alkaline" value="#f97316" oninput="setCatColor('alkaline',this.value)"></div>
+    <div class="ed-field"><label>Transition</label><input type="color" id="c-transition" value="#0891b2" oninput="setCatColor('transition',this.value)"></div>
+    <div class="ed-field"><label>Post-transition</label><input type="color" id="c-posttrans" value="#6b7280" oninput="setCatColor('posttrans',this.value)"></div>
+    <div class="ed-field"><label>Metalloid</label><input type="color" id="c-metalloid" value="#10b981" oninput="setCatColor('metalloid',this.value)"></div>
+    <div class="ed-field"><label>Lanthanide</label><input type="color" id="c-lanthanide" value="#ec4899" oninput="setCatColor('lanthanide',this.value)"></div>
+    <div class="ed-field"><label>Actinide</label><input type="color" id="c-actinide" value="#d97706" oninput="setCatColor('actinide',this.value)"></div>
+  </div>
 </div>
 
 <div id="pt-grid"></div>
@@ -434,6 +567,81 @@ document.getElementById('search').addEventListener('input', e => {
 
 buildGrid();
 buildLegend();
+
+// ── Editor panel ──
+const DEFAULTS = {
+  '--bg':'#0a0e17','--bg2':'#111827','--bg3':'#1e2a3a',
+  '--txt':'#e2e8f0','--accent':'#38bdf8',
+  nonmetal:'#3b82f6', noble:'#a855f7', alkali:'#ef4444',
+  alkaline:'#f97316', transition:'#0891b2', posttrans:'#6b7280',
+  metalloid:'#10b981', lanthanide:'#ec4899', actinide:'#d97706'
+};
+
+function setVar(name, value) {
+  document.documentElement.style.setProperty(name, value);
+}
+
+function setCatColor(cat, value) {
+  CAT_COLORS[cat] = value;
+  buildGrid();
+  buildLegend();
+}
+
+function applyFonts() {
+  document.body.style.fontFamily = document.getElementById('ed-font-body').value;
+  document.querySelectorAll('h1').forEach(el => el.style.fontFamily = document.getElementById('ed-font-head').value);
+}
+
+function resetAll() {
+  // Reset CSS vars
+  ['--bg','--bg2','--accent','--txt'].forEach(v => {
+    setVar(v, DEFAULTS[v]);
+    const id = 'c-' + v.replace('--','');
+    if (document.getElementById(id)) document.getElementById(id).value = DEFAULTS[v];
+  });
+  // Reset category colors
+  ['nonmetal','noble','alkali','alkaline','transition','posttrans','metalloid','lanthanide','actinide'].forEach(cat => {
+    CAT_COLORS[cat] = DEFAULTS[cat];
+    document.getElementById('c-'+cat).value = DEFAULTS[cat];
+  });
+  // Reset fonts
+  document.body.style.fontFamily = '';
+  document.body.style.fontSize = '';
+  document.querySelectorAll('h1').forEach(el => el.style.fontFamily = '');
+  document.getElementById('ed-font-body').value = "'IBM Plex Sans', sans-serif";
+  document.getElementById('ed-font-head').value = "'Space Mono', monospace";
+  document.getElementById('ed-fontsize').value = 16;
+  document.getElementById('fs-val').textContent = 16;
+  // Reset content
+  document.querySelector('h1').textContent = 'Periodic Table';
+  document.querySelector('.subtitle').textContent = '118 elements · Click any element for details · Filter by category';
+  document.getElementById('ed-title').value = 'Periodic Table';
+  document.getElementById('ed-subtitle').value = '118 elements · Click any element for details · Filter by category';
+  buildGrid();
+  buildLegend();
+}
+
+document.getElementById('theme-btn').addEventListener('click', function() {
+  const root = document.documentElement;
+  const isLight = root.getAttribute('data-theme') === 'light';
+  root.setAttribute('data-theme', isLight ? 'dark' : 'light');
+  this.textContent = isLight ? '☀ Light' : '☾ Dark';
+});
+
+document.getElementById('edit-btn').addEventListener('click', function() {
+  const panel = document.getElementById('editor-panel');
+  panel.classList.toggle('visible');
+  this.classList.toggle('open');
+});
+
+document.querySelectorAll('.ed-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.ed-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.ed-pane').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('pane-' + tab.dataset.pane).classList.add('active');
+  });
+});
 </script>
 </body>
 </html>
